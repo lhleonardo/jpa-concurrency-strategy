@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "123456789"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - /home/lhleonardo/volume_data:/var/opt/mssql
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: [ "CMD", "/opt/mssql-tools/bin/sqlcmd", "-Usa", "-P123456789", "-Q", "select 1" ]
+      interval: 1s
+      retries: 20
+
+  app1:
+    image: demo/demo:1.0.4
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  app2:
+    image: demo/demo:1.0.4
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  app3:
+    image: demo/demo:1.0.4
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  app4:
+    image: demo/demo:1.0.4
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  app5:
+    image: demo/demo:1.0.4
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app1
+      - app2
+      - app3
